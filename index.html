@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador de Tareas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #task-form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 400px;
+        }
+
+        #task-form label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        #task-form input,
+        #task-form textarea,
+        #task-form select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+
+        #task-form button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #task-list {
+            margin-top: 20px;
+        }
+
+        .task-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .task-card p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="task-form">
+        <h2>Crear Tarea</h2>
+        <form id="form">
+            <label for="title">Título:</label>
+            <input type="text" id="title" name="title" required>
+
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description"></textarea>
+
+            <label for="deadline">Fecha Límite:</label>
+            <input type="date" id="deadline" name="deadline" required>
+
+            <button type="button" onclick="addTask()">Agregar Tarea</button>
+        </form>
+    </div>
+
+    <div id="task-list">
+        <h2>Tareas</h2>
+        <!-- Aquí se mostrarán las tareas -->
+    </div>
+
+    <script>
+        // Arreglo para almacenar las tareas
+        var tasks = [];
+
+        function addTask() {
+            // Obtener valores del formulario
+            var title = document.getElementById("title").value;
+            var description = document.getElementById("description").value;
+            var deadline = document.getElementById("deadline").value;
+
+            // Validar que se haya ingresado un título y una fecha límite
+            if (!title || !deadline) {
+                alert("El título y la fecha límite son obligatorios");
+                return;
+            }
+
+            // Crear objeto tarea con ID autoincremental
+            var taskId = tasks.length + 1;
+            var task = {
+                id: taskId,
+                title: title,
+                description: description,
+                deadline: deadline,
+                status: true // Por defecto está activado
+            };
+
+            // Agregar tarea al arreglo
+            tasks.push(task);
+
+            // Mostrar todas las tareas
+            displayTasks();
+
+            // Limpiar formulario
+            document.getElementById("form").reset();
+        }
+
+        function displayTasks() {
+            var taskList = document.getElementById("task-list");
+            taskList.innerHTML = ""; // Limpiar la lista antes de volver a mostrar
+
+            // Mostrar cada tarea en la lista
+            tasks.forEach(function(task) {
+                var taskCard = document.createElement("div");
+                taskCard.classList.add("task-card");
+
+                var taskInfo = document.createElement("p");
+                taskInfo.innerHTML = "<strong>ID:</strong> " + task.id + "<br>" +
+                                     "<strong>Título:</strong> " + task.title + "<br>" +
+                                     "<strong>Descripción:</strong> " + (task.description || "N/A") + "<br>" +
+                                     "<strong>Fecha Límite:</strong> " + task.deadline + "<br>" +
+                                     "<strong>Estado:</strong> " + (task.status ? "Activo" : "Inactivo");
+
+                var finishButton = document.createElement("button");
+                finishButton.textContent = "Finalizar";
+                finishButton.addEventListener("click", function() {
+                    toggleTaskStatus(task.id);
+                });
+
+                var deleteButton = document.createElement("button");
+                deleteButton.textContent = "Eliminar";
+                deleteButton.addEventListener("click", function() {
+                    deleteTask(task.id);
+                });
+
+                taskCard.appendChild(taskInfo);
+                taskCard.appendChild(finishButton);
+                taskCard.appendChild(deleteButton);
+                taskList.appendChild(taskCard);
+            });
+        }
+
+        function toggleTaskStatus(taskId) {
+            // Encontrar la tarea en el arreglo
+            var task = tasks.find(function(task) {
+                return task.id === taskId;
+            });
+
+            // Cambiar el estado de la tarea
+            if (task) {
+                task.status = !task.status;
+            }
+
+            // Mostrar todas las tareas actualizadas
+            displayTasks();
+        }
+
+        function deleteTask(taskId) {
+            // Filtrar las tareas para excluir la tarea a eliminar
+            tasks = tasks.filter(function(task) {
+                return task.id !== taskId;
+            });
+
+            // Mostrar todas las tareas actualizadas
+            displayTasks();
+        }
+    </script>
+</body>
+</html>
